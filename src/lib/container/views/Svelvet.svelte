@@ -36,6 +36,7 @@
   export let editable: boolean = false;
   export let resizable: boolean = true;
   export let highlightEdges: boolean = true;
+  export let dotFill = 'gray';
 
   // generates a unique string for each svelvet component's unique store instance
   // creates a store that uses the unique sting as the key to create and look up the corresponding store
@@ -116,6 +117,7 @@
     {initialZoom}
     {boundary}
     {minimap}
+    {dotFill}
   />
   {#if shareable}
     <ImportExport {canvasId} />

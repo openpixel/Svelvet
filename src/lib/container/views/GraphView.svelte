@@ -35,6 +35,7 @@
   export let initialLocation;
   export let boundary = false;
   export let minimap = false;
+  export let dotFill = 'gray';
   // here we lookup the store using the unique key
   const store = findStore(canvasId);
   const {
@@ -290,8 +291,8 @@
         id="dot"
         cx={gridSize / 2 - dotSize / 2}
         cy={gridSize / 2 - dotSize / 2}
-        r="0.5"
-        style="fill: gray"
+        r=0.5
+        style={`fill: ${dotFill}`}
       />
     </pattern>
   </defs>
