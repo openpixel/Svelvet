@@ -1,6 +1,6 @@
 <script lang="ts">
   const pkStringGenerator = () => (Math.random() + 1).toString(36).substring(7);
-  import type { UserEdgeType, UserNodeType } from '../../types/types';
+  import type { BackgroundOpts, UserEdgeType, UserNodeType } from '../../types/types';
 
   import {
     createStoreEmpty,
@@ -17,11 +17,9 @@
 
   export let nodes: UserNodeType[]; // TODO: update type to make possible user id being a number
   export let edges: UserEdgeType[]; // TODO: update type to make possible user id being a number
-  export let bgColor = '#ffffff'; // this is used to set the background color of the the Svelvet canvas
   export let minimap = false;
   export let width: number = 600;
   export let height: number = 600;
-  export let background: boolean = true;
   export let movement: boolean = true;
   export let canvasId: string = pkStringGenerator();
   export let snap: boolean = false;
@@ -36,7 +34,19 @@
   export let editable: boolean = false;
   export let resizable: boolean = true;
   export let highlightEdges: boolean = true;
-  export let dotFill = 'gray';
+  export let bgOpts : BackgroundOpts;
+
+  let defaultBgOpts : BackgroundOpts = {
+    enabled: true,
+    color: '#ffffff',
+    fill: 'gray',
+    size: 2,
+    gridSize: 15,
+  };
+  // finalBgOpts merges user provided options and defaults
+  // to ensure valid values
+  let finalBgOpts;
+  $: finalBgOpts = {...defaultBgOpts, ...bgOpts};
 
   // generates a unique string for each svelvet component's unique store instance
   // creates a store that uses the unique sting as the key to create and look up the corresponding store
@@ -56,7 +66,7 @@
     // initializing nodes/edges might read relevant options from the store.
     store.widthStore.set(width);
     store.heightStore.set(height);
-    store.backgroundStore.set(background);
+    store.backgroundStore.set(finalBgOpts.enabled);
     store.movementStore.set(movement);
     const optionsObj = { snap, snapTo }; // TODO: rename to snap
     store.options.set(optionsObj); //
@@ -85,7 +95,7 @@
     // initializing nodes/edges might read relevant options from the store.
     store.widthStore.set(width);
     store.heightStore.set(height);
-    store.backgroundStore.set(background);
+    store.backgroundStore.set(finalBgOpts.enabled);
     store.movementStore.set(movement);
     const optionsObj = { snap, snapTo }; // TODO: rename to snap
     store.options.set(optionsObj); //
@@ -107,7 +117,7 @@
 <!-- Now that a store has been created from the initial nodes and initial edges we drill props from the store down to the D3 GraphView along with the unique key -->
 <div
   class="Svelvet"
-  style={`width: ${width}px; height: ${height}px; background-color: ${bgColor};`}
+  style={`width: ${width}px; height: ${height}px; background-color: ${finalBgOpts.color};`}
 >
   <GraphView
     {canvasId}
@@ -117,7 +127,7 @@
     {initialZoom}
     {boundary}
     {minimap}
-    {dotFill}
+    bgOpts={finalBgOpts}
   />
   {#if shareable}
     <ImportExport {canvasId} />

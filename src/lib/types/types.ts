@@ -35,6 +35,14 @@ export interface UserEdgeType {
   className?: string;
 }
 
+export interface BackgroundOpts {
+  enabled?: boolean;
+  color?: string;
+  fill?: string;
+  size: number;
+  gridSize: number;
+};
+
 import { findStore } from '../store/controllers/storeApi';
 import { get } from 'svelte/store';
 export function getD3PositionX(canvasId: string) {

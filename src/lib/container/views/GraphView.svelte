@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterUpdate, onMount } from 'svelte';
   import { zoom, zoomTransform, zoomIdentity } from 'd3-zoom';
-  import { select, selectAll, pointer, local } from 'd3-selection';
+  import { select, selectAll, pointer, local, style } from 'd3-selection';
   import SimpleBezierEdge from '../../edges/views/Edges/SimpleBezierEdge.svelte';
   import StepEdge from '../../edges/views/Edges/StepEdge.svelte';
   import SmoothStepEdge from '../../edges/views/Edges/SmoothStepEdge.svelte';
@@ -26,6 +26,7 @@
   import EditEdge from '../../editEdges/views/EditEdge.svelte';
   import { filterByCollapsible } from '../../collapsible/controllers/util';
   import type { AnchorType } from '../../edges/types/types';
+  import type { BackgroundOpts } from '$lib/types/types';
 
   //these are typscripted as any, however they have been transformed inside of store.ts
   export let canvasId: string;
@@ -35,7 +36,7 @@
   export let initialLocation;
   export let boundary = false;
   export let minimap = false;
-  export let dotFill = 'gray';
+  export let bgOpts : BackgroundOpts;
   // here we lookup the store using the unique key
   const store = findStore(canvasId);
   const {
@@ -79,10 +80,6 @@
     filteredAnchors = obj['filteredAnchors'];
   }
 
-  // declaring the grid and dot size for d3's transformations and zoom
-  const gridSize = 15;
-  const dotSize = 10;
-
   // leveraging d3 library to zoom/pan
   let d3 = {
     zoom,
@@ -100,8 +97,8 @@
     height,
     movementStore,
     backgroundStore,
-    gridSize,
-    dotSize,
+    bgOpts.gridSize,
+    bgOpts.size,
     canvasId,
     d3Scale,
     handleZoom
@@ -192,11 +189,11 @@
       d3.select(`#background-${canvasId}`)
         .attr('x', e.transform.x)
         .attr('y', e.transform.y)
-        .attr('width', gridSize * e.transform.k)
-        .attr('height', gridSize * e.transform.k)
+        .attr('width', bgOpts.gridSize * e.transform.k)
+        .attr('height', bgOpts.gridSize * e.transform.k)
         .selectAll('#dot')
-        .attr('x', (gridSize * e.transform.k) / 2 - dotSize / 2)
-        .attr('y', (gridSize * e.transform.k) / 2 - dotSize / 2)
+        .attr('cx', (bgOpts.gridSize * e.transform.k) / 2)
+        .attr('cy', (bgOpts.gridSize * e.transform.k) / 2)
         .attr('opacity', Math.min(e.transform.k, 1));
     }
     // transform 'g' SVG elements (edge, edge text, edge anchor)
@@ -283,16 +280,16 @@
       id={`background-${canvasId}`}
       x="0"
       y="0"
-      width={gridSize}
-      height={gridSize}
+      width={bgOpts.gridSize}
+      height={bgOpts.gridSize}
       patternUnits="userSpaceOnUse"
     >
       <circle
         id="dot"
-        cx={gridSize / 2 - dotSize / 2}
-        cy={gridSize / 2 - dotSize / 2}
-        r=0.5
-        style={`fill: ${dotFill}`}
+        cx={bgOpts.gridSize / 2}
+        cy={bgOpts.gridSize / 2}
+        r={bgOpts.size}
+        style={`fill: ${bgOpts.fill}`}
       />
     </pattern>
   </defs>
